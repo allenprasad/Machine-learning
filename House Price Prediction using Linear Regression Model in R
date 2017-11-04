@@ -1,0 +1,60 @@
+#House Price Prediction
+
+#importing training and testing data from CSV
+
+house_train_data <- read.csv(file = "E:/KAGGLE/HOUSE PRICE/train.csv", header = TRUE , sep = ",")
+
+house_test_data <- read.csv(file = "E:/KAGGLE/HOUSE PRICE/test.csv", header = TRUE , sep = ",")
+
+# Preprocessing
+
+summary(house_train_data)
+
+summary(house_test_data)
+
+is.na(house_train_data)
+
+is.na(house_test_data)
+
+#Replacing the NA values using KNN
+
+library(VIM)
+
+house_train_data = kNN(house_train_data, k = 3)
+
+house_train_data = subset(house_train_data, select = Id:SalePrice)
+
+summary(house_train_data)
+
+house_test_data = kNN(house_test_data, k = 3)
+
+house_test_data = subset(house_test_data, select = Id:SaleCondition)
+
+summary(house_test_data)
+
+#Linear Regression Model
+
+Linear_model <- lm(SalePrice~.-Id,data = house_train_data)
+
+summary(Linear_model)
+
+library(visreg)
+
+visreg(Linear_model)
+
+# Error evaluation on train data
+library(DMwR)
+
+regr.eval(house_train_data$SalePrice, Linear_model$fitted.values) 
+
+#Prediction from test data
+
+Pred_house_price <- predict(Linear_model,house_test_data)
+
+summary(Pred_house_price)
+
+pred_house_price_data <- as.data.frame(Pred_house_price)
+
+# Error evaluation on predicted data
+
+regr.eval(house_train_data$SalePrice, pred_house_price_data)
