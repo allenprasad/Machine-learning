@@ -1,0 +1,141 @@
+import pandas as pd
+ 
+from sklearn.cross_validation import train_test_split
+
+from sklearn.linear_model
+
+import numpy as np
+
+from sklearn import metrics
+
+from sklearn.metrics import confusion_matrix
+
+data = pd.read_csv("E:/KAGGLE/HOUSE PRICE/train.csv") 
+
+type(data)
+
+print(data.shape)
+
+data_feature = data.iloc[:,1:]
+
+data_feature = data_feature.iloc[:,:-1]
+
+print(data_feature.shape)
+
+data_target = data.iloc[: ,-1]
+
+print(data_target.shape)
+
+data_target = data_target.values
+
+#preprocessing
+
+import sklearn.preprocessing as preprocessing
+
+data_feature.head()
+
+#imputation
+def impute_categorical(feature = []):
+    print('impute started')
+    for i in feature:
+        most_common = pd.get_dummies(data_feature[i]).sum().sort_values(ascending=False).index[0]  
+        if pd.isnull(data_feature[i]).any():           
+            data_feature[i] = data_feature[i].fillna(most_common)
+        else:
+            pass
+    print('completed')
+            
+impute_categorical(['MSZoning','Street','Alley',
+        'LotShape','LandContour','Utilities',
+        'LotConfig','LandSlope','Neighborhood',
+        'Condition1','Condition2','BldgType',
+        'HouseStyle','RoofStyle','RoofMatl','Exterior1st',
+        'Exterior2nd','MasVnrType','ExterQual','ExterCond',
+        'Foundation','BsmtQual','BsmtCond','BsmtExposure',
+        'BsmtFinType1','BsmtFinType2','Heating','HeatingQC',
+        'CentralAir','Electrical','KitchenQual','Functional',
+        'FireplaceQu','GarageType','GarageFinish','GarageQual',
+        'GarageCond','PavedDrive','PoolQC','Fence','MiscFeature',
+        'SaleType','SaleCondition'])
+    
+#label encoding
+    
+def labelencoder(feature = []):
+    labelencoder = preprocessing.LabelEncoder()
+    print('labelencoding started')
+    for i in feature:
+        data_feature[i] = labelencoder.fit_transform(data_feature[i].astype('str'))
+    print('labelencoding completed successfully')   
+    
+labelencoder(['MSZoning','Street','Alley',
+        'LotShape','LandContour','Utilities',
+        'LotConfig','LandSlope','Neighborhood',
+        'Condition1','Condition2','BldgType',
+        'HouseStyle','RoofStyle','RoofMatl','Exterior1st',
+        'Exterior2nd','MasVnrType','ExterQual','ExterCond',
+        'Foundation','BsmtQual','BsmtCond','BsmtExposure',
+        'BsmtFinType1','BsmtFinType2','Heating','HeatingQC',
+        'CentralAir','Electrical','KitchenQual','Functional',
+        'FireplaceQu','GarageType','GarageFinish','GarageQual',
+        'GarageCond','PavedDrive','PoolQC','Fence','MiscFeature',
+        'SaleType','SaleCondition'])
+
+data_feature = data_feature.values
+
+#imputation for overall dataset
+
+imputer = preprocessing.Imputer(missing_values='NaN', strategy='mean')
+imputer = imputer.fit(data_feature)
+data_feature = imputer.transform(data_feature)
+
+#standardization
+
+standardizer = preprocessing.StandardScaler()
+standardizer = standardizer.fit(data_feature)
+data_feature = standardizer.transform(data_feature)
+
+print('Mean of each feature after Standardization :\n\n')
+print(data_feature.mean(axis=0))
+print('\nStd. of each feature after Standardization :\n\n')
+print(data_feature.std(axis=0))
+
+
+#spliting for testing and training
+
+X_train, X_test, y_train, y_test = train_test_split(data_feature, data_target, random_state=1)
+
+#traing the linear regression model
+
+reg = linear_model.LinearRegression()
+
+reg.fit(X_train,y_train)
+
+print(reg.intercept_)
+print(reg.coef_)
+
+#prediction
+
+y_pred = reg.predict(X_test)
+
+from sklearn.model_selection import cross_val_score
+
+explained_variance_score(y_test, y_pred, multioutput='uniform_average')
+
+#0.83405993287426528
+
+df = pd.DataFrame(y_pred)
+
+df.to_csv("E:/KAGGLE/HOUSE PRICE/sample.csv")
+
+
+
+
+
+
+
+
+
+
+
+
+
